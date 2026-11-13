@@ -1,0 +1,26 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}Financials — Vishwa Sports{% endblock %}
+
+{% block nav_financials %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>Financial Reports</h1>
+      <p>Review revenue breakdown, outstanding payments & sales trends</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ FINANCIALS SECTION ═══ -->
+    <div class="page-section active" id="section-financials">
+      <div class="kpi-row" id="financialKPIs"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Revenue Breakdown</h3></div>
+          <div class="card-body" id="revenueBreakdown"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Revenue by Jersey Type</h3></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="revenueByTypeChart"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

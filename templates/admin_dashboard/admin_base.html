@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Admin Panel — Vishwa Sports{% endblock %}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'admin.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon" style="font-size:16px;letter-spacing:-0.5px;">VS</div>
+    <div>
+      <span>Vishwa Sports</span>
+      <small>Admin Panel</small>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Overview</div>
+      <a class="nav-item {% block nav_dashboard %}{% endblock %}" href="/admin_dashboard/admin.html">Dashboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Management</div>
+      <a class="nav-item {% block nav_orders %}{% endblock %}" href="/admin_dashboard/orders.html">All Orders</a>
+      <a class="nav-item {% block nav_users %}{% endblock %}" href="/admin_dashboard/users.html">Users & Roles</a>
+
+      <a class="nav-item {% block nav_products %}{% endblock %}" href="/admin_dashboard/products.html">Product Category</a>
+      <a class="nav-item {% block nav_masters %}{% endblock %}" href="/admin_dashboard/masters.html">Master Panel</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reports</div>
+      <a class="nav-item {% block nav_financials %}{% endblock %}" href="/admin_dashboard/financials.html">Financials</a>
+      <a class="nav-item {% block nav_production %}{% endblock %}" href="/admin_dashboard/production.html">Production</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar">{{ current_user_initial }}</div>
+    <div class="info">{{ current_user_name }}<br><small>{{ current_user_role }}</small></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left" style="display: flex; align-items: center;">
+      <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('active');">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <div>
+      {% block topbar_left %}
+      <h1>Admin Dashboard</h1>
+      <p>Full access — monitor orders, users, & financials</p>
+      {% endblock %}
+    </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar">{{ current_user_initial }}</div>
+        <span>{{ current_user_name }}</span>
+      </div>
+      <a href="/logout/" id="logoutBtn" class="btn-logout" title="Sign Out" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #fee2e2; color: #b91c1c; font-size: 13px; font-weight: 600; border-radius: 6px; text-decoration: none; transition: all 0.2s ease; border: 1px solid #fca5a5; cursor: pointer; height: 36px; box-sizing: border-box; margin-left: 8px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span>Logout</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+</div>
+
+<!-- Edit Order Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="editModalTitle">Edit Order</h2>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="editModalBody"></div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal" style="width:500px;">
+    <div class="modal-header">
+      <h2 id="userModalTitle">Add User</h2>
+      <button class="modal-close" onclick="closeUserModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="userModalBody"></div>
+  </div>
+</div>
+
+{% block extra_modals %}{% endblock %}
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{% static 'admin.js' %}?v=20260805.1" defer></script>
+{% include "shared/_orders_data.html" %}
+{% block extra_scripts %}{% endblock %}
+<div class="mobile-overlay" id="mobileOverlay" onclick="document.querySelector('.sidebar').classList.remove('mobile-open'); this.classList.remove('active');"></div>
+</body>
+</html>

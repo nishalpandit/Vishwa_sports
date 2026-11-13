@@ -1,0 +1,44 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}All Orders — Vishwa Sports{% endblock %}
+
+{% block nav_orders %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>All Orders</h1>
+      <p>Manage and override order parameters across all departments</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ ALL ORDERS SECTION ═══ -->
+    <div class="page-section active" id="section-orders">
+      <div class="filter-bar">
+        <select id="filterStatus" onchange="renderOrdersTable()">
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="design_in_progress">In Design</option>
+          <option value="awaiting_approval">Awaiting Approval</option>
+          <option value="declined">Declined</option>
+          <option value="in_production">In Production</option>
+          <option value="qc">Quality Check</option>
+          <option value="paid">Paid</option>
+          <option value="shipped">Shipped</option>
+        </select>
+        <select id="filterSort" onchange="renderOrdersTable()">
+          <option value="date_desc">Newest First</option>
+          <option value="date_asc">Oldest First</option>
+          <option value="total_desc">Highest Value</option>
+        </select>
+        <span style="margin-left:auto;font-size:12px;color:#7A7267;" id="orderCountLabel"></span>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;overflow-x:auto;">
+          <table>
+            <thead>
+              <tr><th>Order ID</th><th>Client</th><th>Type</th><th>Status</th><th>Qty</th><th>Total</th><th>Payment</th><th>Designer</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="ordersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}

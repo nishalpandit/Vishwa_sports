@@ -1,0 +1,225 @@
+{% extends "designer_dashboard/designer_base.html" %}
+{% block title %}Design Canvas — Vishwa Sports{% endblock %}
+
+{% block nav_canvas %}active{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+{% endblock %}
+
+{% block topbar_left %}
+<h1>Jersey Design Canvas</h1>
+        <p>Configure all jersey details and generate AI mockup</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ DESIGN CANVAS SECTION ═══ -->
+      <div class="page-section active" id="section-canvas">
+        <div class="design-canvas">
+          <div class="canvas-header">
+            <h2>Jersey Design Canvas</h2>
+            <p>Configure all jersey details and generate AI mockup</p>
+          </div>
+          <div class="canvas-body">
+            
+            {% if error_message %}
+            <div style="padding:16px; background:#FEF2F2; color:#A33B3B; border-radius:8px; margin-bottom:20px; font-weight:600; font-size:14px; border:1px solid #FCA5A5;">
+              {{ error_message }}
+            </div>
+            {% endif %}
+            
+            {% if success_message %}
+            <div style="padding:16px; background:#F0FDF4; color:#6B8E4E; border-radius:8px; margin-bottom:20px; font-weight:600; font-size:14px; border:1px solid #BBF7D0;">
+              {{ success_message }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'designer_canvas' %}">
+              {% csrf_token %}
+              <input type="hidden" name="generated_mockup_url" value="{{ generated_mockup_url|default:'' }}">
+              <input type="hidden" name="generated_cutout_url" value="{{ generated_cutout_url|default:'' }}">
+              <input type="hidden" name="order_id" value="{{ selected_order.id|default:'' }}">
+
+              <!-- Order Selection -->
+              <div class="form-group" style="margin-bottom:24px;">
+                <label>Select Order or Catalog Item to Design</label>
+                <select id="canvasOrderSelect" onchange="window.location.href='?order_id=' + this.value;">
+                  <option value="">— Select an order or catalog item —</option>
+                  {% for p in products %}
+                  <option value="{{ p.id }}" {% if selected_order.id == p.id %}selected{% endif %}>PROD-{{ p.id }} - {{ p.on_jersey_name }} ({{ p.jersey_type }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              {% if selected_order %}
+              <div id="canvasWorkspace">
+                <div class="canvas-grid">
+                  <div class="canvas-left">
+                    <h4 style="font-size:15px;font-weight:700;margin-bottom:12px;color:#2B2620;">Jersey Configuration</h4>
+
+                    <!-- Jersey Type -->
+                    <div class="form-group">
+                      <label>Jersey Type</label>
+                      <select name="jerseyType">
+                        {% for t in jersey_types %}
+                        <option value="{{ t.name }}" {% if selected_order.jersey_type == t.name %}selected{% endif %}>{{ t.name }}</option>
+                        {% endfor %}
+                        <option value="{{ selected_order.jersey_type }}" selected>{{ selected_order.jersey_type }}</option>
+                      </select>
+                    </div>
+
+                    <!-- Size -->
+                    <div class="form-group">
+                      <label>Primary Size</label>
+                      <div class="size-selector">
+                        <div class="size-option" data-size="XS">XS</div>
+                        <div class="size-option" data-size="S">S</div>
+                        <div class="size-option" data-size="M">M</div>
+                        <div class="size-option selected" data-size="L">L</div>
+                        <div class="size-option" data-size="XL">XL</div>
+                        <div class="size-option" data-size="XXL">XXL</div>
+                      </div>
+                    </div>
+
+                    <!-- Logo Upload -->
+                    <div class="form-group">
+                      <label>Team Logo</label>
+                      <div class="upload-box" style="cursor:default; background:#FBF9F6;">
+                        {% if selected_order.logo %}
+                        <p style="font-weight:600;color:#6B8E4E;margin:0;">✓ {{ selected_order.logo.name }}</p>
+                        <img src="{{ selected_order.logo.url }}" style="max-height:40px;margin-top:6px;border-radius:4px;" alt="Logo">
+                        {% else %}
+                        <p style="font-weight:600;color:#A33B3B;margin:0;">No logo attached</p>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <!-- Attached Jersey Design (from Catalog) -->
+                    <div class="form-group">
+                      <label>Attached Jersey Design</label>
+                      <div class="upload-box" style="cursor:default; background:#FBF9F6;">
+                        {% if selected_order.design %}
+                        <p style="font-weight:600;color:#6B8E4E;margin:0;">✓ Design Attached</p>
+                        <img src="{{ selected_order.design.url }}" style="max-width:100%;max-height:100px;margin-top:6px;border-radius:4px;" alt="Attached Design">
+                        {% else %}
+                        <p style="font-weight:600;color:#A33B3B;margin:0;">No design attached</p>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <!-- Name & Number -->
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Player Name</label>
+                        <input type="text" name="playerName" value="{{ selected_order.on_jersey_name|default:'' }}" placeholder="e.g. STRIKER" required>
+                      </div>
+                      <div class="form-group">
+                        <label>Jersey Number</label>
+                        <input type="text" name="jerseyNumber" value="{{ selected_order.on_jersey_number|default:'' }}" placeholder="e.g. 10" maxlength="3" required>
+                      </div>
+                    </div>
+
+                    <!-- Price Input -->
+                    <div class="form-group" style="margin-top:8px;">
+                      <label>Suggested Unit Price (₹)</label>
+                      <input type="number" name="suggestedPrice" value="{{ selected_order.unit_price|default:'' }}" placeholder="e.g. 500" step="10" style="font-weight:700;font-size:16px;">
+                    </div>
+                  </div>
+
+                  <div class="canvas-right">
+                    <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;color:#2B2620;">Mockup Preview</h4>
+
+                    <div id="jerseyPreview" style="position:relative;">
+                      
+                      {% if not generated_mockup_url %}
+                      <div id="previewPlaceholder" style="display:flex; flex-direction:column; gap:16px;">
+                        <div style="flex:1; background:linear-gradient(145deg,#F8FAFC,#E2E8F0); border-radius:16px; border:2px dashed #CBD5E1; padding:60px 20px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          <p style="margin:0; font-size:14px; color:#94A3B8; font-weight:600;">3D Mockup<br><span style="font-weight:400; font-size:12px;">(For Client)</span></p>
+                        </div>
+                        <div style="flex:1; background:linear-gradient(145deg,#F8FAFC,#E2E8F0); border-radius:16px; border:2px dashed #CBD5E1; padding:60px 20px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          <p style="margin:0; font-size:14px; color:#94A3B8; font-weight:600;">2D Cutout Layout<br><span style="font-weight:400; font-size:12px;">(Internal)</span></p>
+                        </div>
+                      </div>
+                      {% else %}
+                      <div id="previewImagesContainer" style="display:flex; flex-direction:column; gap:16px;">
+                        <div style="flex:1; background:linear-gradient(145deg,#F0FDF4,#DCFCE7); border-radius:16px; border:2px solid #6B8E4E; padding:16px; display:flex; flex-direction:column; align-items:center;">
+                          <h5 style="margin-top:0; margin-bottom:16px; font-size:14px; font-weight:700; color:#2B2620; text-align:center;">3D Mockup (For Client)</h5>
+                          <img id="mockupImage" src="{{ generated_mockup_url }}" alt="Jersey Mockup" onclick="openFullscreen(this.src)" style="width:100%; height:auto; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,0.15); cursor:zoom-in;">
+                        </div>
+                        <div style="flex:1; background:linear-gradient(145deg,#F0FDF4,#DCFCE7); border-radius:16px; border:2px solid #6B8E4E; padding:16px; display:flex; flex-direction:column; align-items:center;">
+                          <h5 style="margin-top:0; margin-bottom:16px; font-size:14px; font-weight:700; color:#2B2620; text-align:center;">2D Cutout Layout (Internal)</h5>
+                          <img id="cutoutImage" src="{{ generated_cutout_url }}" alt="Jersey Cutout" onclick="openFullscreen(this.src)" style="width:100%; height:auto; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,0.15); cursor:zoom-in;">
+                        </div>
+                      </div>
+                      {% endif %}
+
+                      <div class="generating-overlay" id="generatingOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.85); flex-direction:column; align-items:center; justify-content:center; z-index:10; border-radius:16px;">
+                        <div class="spinner" style="width:40px;height:40px;border:4px solid #F1ECE2;border-top:4px solid #C1652C;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;"></div>
+                        <p style="font-weight:600;color:#2B2620;">Generating AI Mockups... (takes up to 60s)</p>
+                      </div>
+                    </div>
+
+                    {% if generated_mockup_url %}
+                    <div class="mockup-result" style="display:block; margin-top:20px; padding:16px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px;">
+                      <h4 style="margin:0 0 8px; color:#166534; font-size:14px;">AI Mockup Generated!</h4>
+                      <p style="margin:0; font-size:13px; color:#15803D;">The mockup has been created based on your configuration. Review it and send to the client for approval.</p>
+                    </div>
+                    {% endif %}
+
+                    <div style="margin-top:20px;">
+                      <button type="submit" name="action" value="generate" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;" onclick="document.getElementById('generatingOverlay').style.display='flex';">
+                        Generate AI Mockup
+                      </button>
+                    </div>
+
+                    <div class="action-bar" style="margin-top:16px; display:flex; gap:12px;">
+                      <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'designer_canvas' %}?order_id={{ selected_order.id }}'">Reset</button>
+                      <button type="submit" name="action" value="send_client" class="btn btn-success btn-lg" style="flex:1;justify-content:center;" {% if not generated_mockup_url %}disabled{% endif %}>
+                        Send to Client for Approval
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <div id="canvasEmpty" style="text-align:center;padding:60px 20px;color:#7A7267;">
+                <p style="font-size:16px;font-weight:500;">Select an item from the dropdown above to open the design canvas workspace</p>
+              </div>
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fullscreen Image Modal -->
+    <div id="fullscreenModal" style="display:none; position:fixed; z-index:999999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.9); flex-direction:column; justify-content:center; align-items:center;">
+      <span onclick="closeFullscreen()" style="position:absolute; top:20px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer; transition:0.3s;">&times;</span>
+      <img id="fullscreenImg" style="margin:auto; display:block; max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 40px rgba(0,0,0,0.5);">
+    </div>
+
+    <script>
+      function openFullscreen(src) {
+        const modal = document.getElementById('fullscreenModal');
+        const img = document.getElementById('fullscreenImg');
+        img.src = src;
+        modal.style.display = "flex";
+      }
+      function closeFullscreen() {
+        document.getElementById('fullscreenModal').style.display = "none";
+      }
+      // Close on background click
+      document.getElementById('fullscreenModal').addEventListener('click', function(e) {
+        if(e.target === this) {
+          closeFullscreen();
+        }
+      });
+      
+      // Inline spin animation
+      const style = document.createElement('style');
+      style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+      document.head.append(style);
+    </script>
+{% endblock %}

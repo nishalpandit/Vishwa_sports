@@ -1,0 +1,54 @@
+{% extends "designer_dashboard/designer_base.html" %}
+{% block title %}Designer Dashboard — Vishwa Sports{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block topbar_left %}
+<h1>Designer Dashboard</h1>
+        <p>Review orders, create mockups, set pricing</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ DASHBOARD SECTION ═══ -->
+      <div class="page-section active" id="section-dashboard">
+        <div class="kpi-row" id="kpiRow"></div>
+        <div class="grid-3-1">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Orders in Queue</h3>
+              <a class="btn-link" href="/designer_dashboard/queue.html" style="text-decoration:none;">View All →</a>
+            </div>
+            <div class="card-body" style="padding:0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Assets</th>
+                    <th>Client</th>
+                    <th>Type</th>
+                    <th>Details</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardQueueBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Status Overview</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap"><canvas id="statusDoughnut"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+{% endblock %}

@@ -1,0 +1,405 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designer Dashboard — Vishwa Sports</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'designer.css' %}">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon" style="font-size:16px;letter-spacing:-0.5px;">VS</div>
+    <div>
+      <span>Vishwa Sports</span>
+      <small>Designer Panel</small>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Overview</div>
+      <button class="nav-item active" onclick="showSection('dashboard')">
+        Dashboard
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Work</div>
+      <button class="nav-item" onclick="showSection('queue')">
+        Incoming Queue
+      </button>
+      <button class="nav-item" onclick="showSection('canvas')">
+        Design Canvas
+      </button>
+      <button class="nav-item" onclick="showSection('history')">
+        Design History
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Analytics</div>
+      <button class="nav-item" onclick="showSection('charts')">
+        Charts
+      </button>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar">{{ current_user_initial }}</div>
+    <div class="info">{{ current_user_name }}<br><small>{{ current_user_role }}</small></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left" style="display: flex; align-items: center;">
+      <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('active');">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <div>
+      <h1>Designer Dashboard</h1>
+      <p>Review orders, create mockups, set pricing</p>
+    </div>
+    </div>
+    <div class="topbar-right">
+      <div class="notif-bell" onclick="showToast('No new notifications')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="dot"></span>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">{{ current_user_initial }}</div>
+        <span>{{ current_user_name }}</span>
+      </div>
+      <a href="/logout/" id="logoutBtn" class="btn-logout" title="Sign Out" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #fee2e2; color: #b91c1c; font-size: 13px; font-weight: 600; border-radius: 6px; text-decoration: none; transition: all 0.2s ease; border: 1px solid #fca5a5; cursor: pointer; height: 36px; box-sizing: border-box; margin-left: 8px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span>Logout</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="content">
+    
+    <!-- ═══ DASHBOARD SECTION ═══ -->
+    <div class="page-section active" id="section-dashboard">
+      <div class="kpi-row" id="kpiRow"></div>
+      <div class="grid-3-1">
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Orders in Queue</h3>
+            <button class="btn-link" onclick="showSection('queue')">View All →</button>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr><th>Order ID</th><th>Client</th><th>Type</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="dashboardQueueBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Status Overview</h3></div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="statusDoughnut"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ QUEUE SECTION ═══ -->
+    <div class="page-section" id="section-queue">
+      <div class="card" style="margin-bottom:28px;">
+        <div class="card-header">
+          <h3>Incoming Orders Queue</h3>
+          <span class="badge badge-blue" id="queueCount">0 orders</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Client</th>
+                <th>Jersey Type</th>
+                <th>Size</th>
+                <th>Status</th>
+                <th>Age</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="queueTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DESIGN CANVAS SECTION ═══ -->
+    <div class="page-section" id="section-canvas">
+      <div class="design-canvas">
+        <div class="canvas-header">
+          <h2>Jersey Design Canvas</h2>
+          <p>Configure all jersey details and generate AI mockup</p>
+        </div>
+        <div class="canvas-body">
+          <!-- Order Selection -->
+          <div class="form-group" style="margin-bottom:24px;">
+            <label>Select Order to Design</label>
+            <select id="canvasOrderSelect" onchange="loadOrderToCanvas()">
+              <option value="">— Select an order —</option>
+            </select>
+          </div>
+
+          <div id="canvasWorkspace" style="display:none;">
+            <div class="canvas-grid">
+              <div class="canvas-left">
+                <h4 style="font-size:15px;font-weight:700;margin-bottom:12px;color:#2B2620;">Jersey Configuration</h4>
+
+                <!-- Design Mode Toggle -->
+                <div class="mode-toggle" id="modeToggle" style="margin-bottom:20px;">
+                  <button type="button" class="mode-btn active" data-mode="ai" onclick="switchDesignMode('ai')">
+                    AI Quick Generate
+                  </button>
+                  <button type="button" class="mode-btn" data-mode="manual" onclick="switchDesignMode('manual')">
+                    Manual Design
+                  </button>
+                </div>
+                <p class="mode-hint" id="modeHint">In AI mode, colors, fabric &amp; pattern are optional — leave on "Auto" and the AI will choose. Switch to Manual to set every field yourself.</p>
+
+                <!-- Jersey Type -->
+                <div class="form-group">
+                  <label>Jersey Type</label>
+                  <select id="jerseyType">
+                    <option value="T-Shirt">T-Shirt</option>
+                    <option value="Polo T-Shirt">Polo T-Shirt</option>
+                    <option value="V-Neck">V-Neck</option>
+                    <option value="Hoodie">Hoodie</option>
+                    <option value="Tank Top">Tank Top</option>
+                    <option value="Raglan">Raglan</option>
+                  </select>
+                </div>
+
+                <!-- Size -->
+                <div class="form-group">
+                  <label>Primary Size</label>
+                  <div class="size-selector">
+                    <div class="size-option" data-size="XS">XS</div>
+                    <div class="size-option" data-size="S">S</div>
+                    <div class="size-option" data-size="M">M</div>
+                    <div class="size-option selected" data-size="L">L</div>
+                    <div class="size-option" data-size="XL">XL</div>
+                    <div class="size-option" data-size="XXL">XXL</div>
+                  </div>
+                </div>
+
+                <!-- Fabric -->
+                <div class="form-group">
+                  <label>Fabric Type <span class="field-tag optional" id="tagFabric">Optional</span></label>
+                  <div class="fabric-cards">
+                    <div class="fabric-card selected" data-fabric="auto">
+                      <p style="font-weight:600;">Auto</p>
+                    </div>
+                    <div class="fabric-card" data-fabric="Polyester">
+                      <p style="font-weight:600;">Polyester</p>
+                    </div>
+                    <div class="fabric-card" data-fabric="Cotton Blend">
+                      <p style="font-weight:600;">Cotton Blend</p>
+                    </div>
+                    <div class="fabric-card" data-fabric="Mesh">
+                      <p style="font-weight:600;">Mesh</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Primary Color -->
+                <div class="form-group">
+                  <label>Primary Color <span class="field-tag optional" id="tagPrimaryColor">Optional</span></label>
+                  <div class="color-picker">
+                    <div class="color-option auto-swatch selected" data-color="auto" title="Auto — AI decides" style="display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;">AUTO</div>
+                    <div class="color-option" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E1D6;"></div>
+                    <div class="color-option" data-color="#2B2620" style="background:#2B2620;"></div>
+                    <div class="color-option" data-color="#A33B3B" style="background:#A33B3B;"></div>
+                    <div class="color-option" data-color="#2F6F63" style="background:#2F6F63;"></div>
+                    <div class="color-option" data-color="#6B8E4E" style="background:#6B8E4E;"></div>
+                    <div class="color-option" data-color="#C1652C" style="background:#C1652C;"></div>
+                    <div class="color-option" data-color="#6B4A6B" style="background:#6B4A6B;"></div>
+                  </div>
+                </div>
+
+                <!-- Secondary Color -->
+                <div class="form-group">
+                  <label>Secondary Color <span class="field-tag optional" id="tagSecondaryColor">Optional</span></label>
+                  <div class="color-picker" id="secondaryColorPicker">
+                    <div class="color-option auto-swatch selected" data-color="auto" title="Auto — AI decides" style="display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;">AUTO</div>
+                    <div class="color-option" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E1D6;"></div>
+                    <div class="color-option" data-color="#2B2620" style="background:#2B2620;"></div>
+                    <div class="color-option" data-color="#A33B3B" style="background:#A33B3B;"></div>
+                    <div class="color-option" data-color="#2F6F63" style="background:#2F6F63;"></div>
+                    <div class="color-option" data-color="#6B8E4E" style="background:#6B8E4E;"></div>
+                    <div class="color-option" data-color="#C1652C" style="background:#C1652C;"></div>
+                  </div>
+                </div>
+
+                <!-- Design Pattern -->
+                <div class="form-group">
+                  <label>Design Pattern <span class="field-tag optional" id="tagPattern">Optional</span></label>
+                  <select id="designPattern">
+                    <option value="auto">Auto (AI decides)</option>
+                    <option value="Solid">Solid</option>
+                    <option value="Stripes">Stripes</option>
+                    <option value="Gradient">Gradient</option>
+                    <option value="Geometric">Geometric</option>
+                    <option value="Camo">Camo</option>
+                    <option value="Abstract">Abstract</option>
+                  </select>
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="form-group">
+                  <label>Team Logo</label>
+                  <div class="upload-box" onclick="simulateLogoUpload()">
+                    <p style="font-weight:600;">Click to upload logo</p>
+                    <div class="uploaded" id="logoFileName" style="display:none;"></div>
+                  </div>
+                </div>
+
+                <!-- Name & Number -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Player Name</label>
+                    <input type="text" id="playerName" placeholder="e.g. STRIKER">
+                  </div>
+                  <div class="form-group">
+                    <label>Jersey Number</label>
+                    <input type="text" id="jerseyNumber" placeholder="e.g. 10" maxlength="3">
+                  </div>
+                </div>
+
+                <!-- Price Calculator -->
+                <div style="background:#F9FAFB;border-radius:12px;padding:16px;margin-top:8px;">
+                  <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;">Price Calculator</h4>
+                  <div class="form-row-3">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Base (₹)</label>
+                      <input type="number" id="calcBase" value="350" step="10">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Complexity</label>
+                      <input type="number" id="calcComplex" value="1.2" step="0.1">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label>Margin %</label>
+                      <input type="number" id="calcMargin" value="25" step="1">
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+                    <label>Suggested Unit Price</label>
+                    <input type="text" id="suggestedPrice" readonly style="background:#F0FDF4;font-weight:700;color:#6B8E4E;font-size:16px;">
+                  </div>
+                </div>
+              </div>
+
+              <div class="canvas-right">
+                <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;color:#2B2620;">Mockup Preview</h4>
+                
+                <div class="jersey-preview" id="jerseyPreview">
+                  <div class="preview-placeholder">
+                    <p>Configure options and generate AI mockup</p>
+                  </div>
+                  <div class="preview-image" id="previewImage" style="display:none;">
+                    <img id="mockupImage" src="" alt="Jersey Mockup">
+                  </div>
+                  <div class="generating-overlay" id="generatingOverlay">
+                    <div class="spinner"></div>
+                    <p>Generating AI Mockup...</p>
+                  </div>
+                </div>
+
+                <div class="mockup-result" id="mockupResult">
+                  <h4>AI Mockup Generated!</h4>
+                  <p>The mockup has been created based on your configuration. Review it and send to the client for approval.</p>
+                </div>
+
+                <div style="margin-top:20px;">
+                  <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center;" onclick="generateAIMockup()">
+                    Generate AI Mockup
+                  </button>
+                </div>
+
+                <div class="action-bar">
+                  <button class="btn btn-secondary" onclick="resetCanvas()">Reset</button>
+                  <button class="btn btn-success btn-lg" id="sendToClientBtn" onclick="sendToClient()" disabled>
+                    Send to Client for Approval
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="canvasEmpty" style="text-align:center;padding:60px 20px;color:#7A7267;">
+            <p style="font-size:16px;font-weight:500;">Select an order above to start designing</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HISTORY SECTION ═══ -->
+    <div class="page-section" id="section-history">
+      <div class="card">
+        <div class="card-header">
+          <h3>Design History</h3>
+          <span class="badge badge-purple" id="historyCount">0 designs</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Client</th>
+                <th>Jersey Type</th>
+                <th>Unit Price</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHARTS SECTION ═══ -->
+    <div class="page-section" id="section-charts">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Designs Created (Last 7 Days)</h3></div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="designsBarChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Approval Rate Trend</h3></div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="approvalLineChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Orders by Jersey Type</h3></div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="typeBarChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="{% static 'designer.js' %}?v=20260805.1" defer></script>
+<div class="mobile-overlay" id="mobileOverlay" onclick="document.querySelector('.sidebar').classList.remove('mobile-open'); this.classList.remove('active');"></div>
+</body>
+</html>

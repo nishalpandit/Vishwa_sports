@@ -1,0 +1,26 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}Production — Vishwa Sports{% endblock %}
+
+{% block nav_production %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>Production Analytics</h1>
+      <p>Monitor factory completion rates, QC statistics & lead times</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ PRODUCTION REPORTS SECTION ═══ -->
+    <div class="page-section active" id="section-production">
+      <div class="kpi-row" id="prodKPIs"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Production Metrics</h3></div>
+          <div class="card-body" id="prodMetricsBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Completion Rate Trend</h3></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="completionRateChart"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

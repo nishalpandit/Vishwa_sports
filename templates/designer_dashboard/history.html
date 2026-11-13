@@ -1,0 +1,66 @@
+{% extends "designer_dashboard/designer_base.html" %}
+{% block title %}Design History — Vishwa Sports{% endblock %}
+
+{% block nav_history %}active{% endblock %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block topbar_left %}
+<h1>Design History</h1>
+        <p>Archive of completed designs, mockups and pricing</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ HISTORY SECTION ═══ -->
+      <div class="page-section active" id="section-history">
+        <div class="card">
+          <div class="card-header">
+            <h3>Design History</h3>
+            <span class="badge badge-purple" id="historyCount">0 designs</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Assets</th>
+                  <th>Client</th>
+                  <th>Jersey Type</th>
+                  <th>Unit Price</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    <!-- Fullscreen Image Modal -->
+    <div id="fullscreenModal" style="display:none; position:fixed; z-index:999999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.9); flex-direction:column; justify-content:center; align-items:center;">
+      <span onclick="closeFullscreen()" style="position:absolute; top:20px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer; transition:0.3s;">&times;</span>
+      <img id="fullscreenImg" style="margin:auto; display:block; max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 40px rgba(0,0,0,0.5);">
+    </div>
+
+    <script>
+      function openFullscreen(src) {
+        const modal = document.getElementById('fullscreenModal');
+        const img = document.getElementById('fullscreenImg');
+        img.src = src;
+        modal.style.display = "flex";
+      }
+      function closeFullscreen() {
+        document.getElementById('fullscreenModal').style.display = "none";
+      }
+      // Close on background click
+      document.getElementById('fullscreenModal').addEventListener('click', function(e) {
+        if(e.target === this) {
+          closeFullscreen();
+        }
+      });
+    </script>
+{% endblock %}

@@ -1,0 +1,33 @@
+<script>
+window.ordersData = [
+  {% for product in products %}
+  {
+    id: "PROD-{{ product.id }}",
+    raw_id: "{{ product.id }}",
+    clientName: "{{ product.on_jersey_name|escapejs }} #{{ product.on_jersey_number|escapejs }} (Catalog Item)",
+    jerseyType: "{{ product.jersey_type|escapejs }}",
+    designAssets: {
+      logoUrl: "{% if product.logo %}{{ product.logo.url }}{% endif %}",
+      patternUrl: "",
+      nameNumber: "{{ product.on_jersey_name|escapejs }} / {{ product.on_jersey_number|escapejs }}"
+    },
+    prelimSize: "{% if product.available_sizes %}{{ product.available_sizes.0 }}{% else %}L{% endif %}",
+    status: "{{ product.order_status }}",
+    prodStage: "{% if product.order_status in 'approved,accepted,qty_pending' %}verify{% elif product.order_status == 'in_production' %}printing{% elif product.order_status == 'qc' %}qc{% elif product.order_status in 'ready_for_payment,paid,shipped' %}done{% else %}null{% endif %}",
+    designPreviewUrl: "{% if product.design %}{{ product.design.url }}{% endif %}",
+    mockupUrl: "{% if product.mockup %}{{ product.mockup.url }}{% endif %}",
+    cutoutUrl: "{% if product.cutout %}{{ product.cutout.url }}{% endif %}",
+    unitPrice: {{ product.unit_price|default:0 }},
+    quantity: 1,
+    sizeBreakdown: {},
+    totalCost: {{ product.unit_price|default:0 }},
+    paymentStatus: "unpaid",
+    assignedDesigner: "{{ current_user_name|default:'Designer' }}",
+    assignedProduction: "",
+    qcStatus: "pending",
+    createdAt: "{{ product.created_at|date:'Y-m-d\\TH:i:s\\Z' }}",
+    history: []
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+];
+</script>

@@ -1,0 +1,40 @@
+{% extends "designer_dashboard/designer_base.html" %}
+{% block title %}Pending Designs — Vishwa Sports{% endblock %}
+
+{% block nav_queue %}active{% endblock %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block topbar_left %}
+<h1>Incoming Orders Queue</h1>
+        <p>Active customer customization requests waiting for mockup creation</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ QUEUE SECTION ═══ -->
+      <div class="page-section active" id="section-queue">
+        <div class="card" style="margin-bottom:28px;">
+          <div class="card-header">
+            <h3>Incoming Orders Queue</h3>
+            <span class="badge badge-blue" id="queueCount">0 orders</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Assets</th>
+                  <th>Client</th>
+                  <th>Jersey Type</th>
+                  <th>Size / Details</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="queueTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+{% endblock %}

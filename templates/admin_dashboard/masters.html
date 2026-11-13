@@ -1,0 +1,71 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}Master Panel — Vishwa Sports{% endblock %}
+
+{% block nav_masters %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>Master Panel</h1>
+      <p>Configure master lists for jersey styles and available sizing options</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ MASTER PANEL SECTION ═══ -->
+    <div class="page-section active" id="section-masters">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;">
+        <!-- Jersey Types Master Card -->
+        <div class="card">
+          <div class="card-header"><h3>Jersey Types Master List</h3></div>
+          <div class="card-body" style="padding:24px;">
+            <p style="font-size:13px;color:#7A7267;margin-bottom:16px;">Add or remove jersey type styles available in the product catalog customizer.</p>
+            
+            <div style="display:flex;gap:10px;margin-bottom:24px;">
+              <input type="text" id="newJerseyTypeInput" placeholder="e.g., Zipper Polo Jersey" style="flex:1;padding:10px 14px;border:1px solid #D6CEC2;border-radius:8px;font-size:14px;outline:none;" onkeydown="if(event.key==='Enter') addMasterJerseyType()">
+              <button class="btn btn-primary" style="padding:10px 18px;font-weight:700;white-space:nowrap;" onclick="addMasterJerseyType()">+ Add Type</button>
+            </div>
+
+            <div style="border:1px solid #E8E1D6;border-radius:10px;overflow:hidden;">
+              <table style="width:100%;border-collapse:collapse;background:#fff;">
+                <thead>
+                  <tr style="background:#FBF9F6;border-bottom:1px solid #E8E1D6;">
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;text-transform:uppercase;color:#7A7267;letter-spacing:0.5px;">Jersey Style Name</th>
+                    <th style="padding:12px 16px;text-align:right;font-size:12px;text-transform:uppercase;color:#7A7267;letter-spacing:0.5px;width:100px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="masterJerseyTypesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Sizes Master Card -->
+        <div class="card">
+          <div class="card-header"><h3>Available Sizes Master List</h3></div>
+          <div class="card-body" style="padding:24px;">
+            <p style="font-size:13px;color:#7A7267;margin-bottom:16px;">Configure standardized size codes available for customization across apparel.</p>
+            
+            <div style="display:flex;gap:10px;margin-bottom:24px;">
+              <input type="text" id="newSizeInput" placeholder="e.g., 4XL or XS" style="flex:1;padding:10px 14px;border:1px solid #D6CEC2;border-radius:8px;font-size:14px;outline:none;" onkeydown="if(event.key==='Enter') addMasterSize()">
+              <button class="btn btn-primary" style="padding:10px 18px;font-weight:700;white-space:nowrap;" onclick="addMasterSize()">+ Add Size</button>
+            </div>
+
+            <div style="border:1px solid #E8E1D6;border-radius:10px;overflow:hidden;">
+              <table style="width:100%;border-collapse:collapse;background:#fff;">
+                <thead>
+                  <tr style="background:#FBF9F6;border-bottom:1px solid #E8E1D6;">
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;text-transform:uppercase;color:#7A7267;letter-spacing:0.5px;">Size Label</th>
+                    <th style="padding:12px 16px;text-align:right;font-size:12px;text-transform:uppercase;color:#7A7267;letter-spacing:0.5px;width:100px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="masterSizesTableBody"></tbody>
+              </table>
+            </div>
+        </div>
+
+
+      </div>
+
+    </div>
+{% endblock %}

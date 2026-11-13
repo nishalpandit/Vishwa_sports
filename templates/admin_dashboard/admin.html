@@ -1,0 +1,54 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}Admin Dashboard — Vishwa Sports{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>Admin Dashboard</h1>
+      <p>Full access — monitor orders, users, & financials</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ OVERVIEW SECTION ═══ -->
+    <div class="page-section active" id="section-overview">
+      <div class="kpi-row" id="overviewKPIs"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Revenue Over Time</h3></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="revenueLineChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Order Status Distribution</h3></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="statusDoughnut"></canvas></div></div>
+        </div>
+      </div>
+      <div class="grid-2">
+
+        <div class="card">
+          <div class="card-header"><h3>Production Metrics</h3></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="prodMetricsChart"></canvas></div></div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header"><h3>Recent Orders</h3></div>
+          <div class="card-body" style="padding: 0;">
+            <table class="table" style="margin: 0; width: 100%;">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Client</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+{% endblock %}

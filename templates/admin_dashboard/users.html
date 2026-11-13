@@ -1,0 +1,42 @@
+{% extends "admin_dashboard/admin_base.html" %}
+{% block title %}Users & Roles — Vishwa Sports{% endblock %}
+
+{% block nav_users %}active{% endblock %}
+
+{% block topbar_left %}
+<h1>Users & Roles</h1>
+      <p>Manage employee access, roles, and system status</p>
+{% endblock %}
+
+{% block content %}
+<!-- ═══ USERS SECTION ═══ -->
+    <div class="page-section active" id="section-users">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;background:#FFF;border:1px solid #E5E2DC;border-radius:6px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+            <span style="font-size:13px;font-weight:600;color:#7A7267;">Role by:</span>
+            <select id="userRoleFilter" onchange="filterUsersTable()" style="border:none;background:transparent;font-size:13px;font-weight:600;color:#1E1C1A;cursor:pointer;outline:none;">
+              <option value="ALL">All Roles</option>
+              <option value="Admin">Admin</option>
+              <option value="Designer">Designer</option>
+              <option value="Production">Production</option>
+              <option value="User">User</option>
+            </select>
+          </div>
+          <div style="position:relative;width:240px;">
+            <input type="text" id="userSearchInput" oninput="filterUsersTable()" placeholder="Search users or email..." style="width:100%;padding:7px 12px 7px 32px;font-size:13px;border:1px solid #E5E2DC;border-radius:6px;outline:none;background:#FFF;box-shadow:0 1px 2px rgba(0,0,0,0.03);box-sizing:border-box;">
+            <svg style="width:14px;height:14px;fill:#7A7267;position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.7;" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </div>
+          <button class="btn btn-primary" onclick="openUserModal()">+ Add User</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}
